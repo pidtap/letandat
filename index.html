@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lê Tấn Đạt</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="public/avatar.jpg">
+    <!-- Modern Font: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Premium Font: Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <!-- Intro Popup Overlay with Glassmorphism -->
+    <div class="intro-overlay" id="introOverlay">
+        <div class="intro-blob intro-blob-1"></div>
+        <div class="intro-blob intro-blob-2"></div>
+        <div class="intro-blob intro-blob-3"></div>
+        <div class="intro-blob intro-blob-4"></div>
+        
+        <div class="intro-card">
+            <h2 id="introName">Lê Tấn Đạt</h2>
+            <p class="intro-title" id="introTitle"></p>
+            <button class="intro-btn" id="introBtn" aria-label="Xem thông tin">
+                <span>Xem Ngay</span> <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Background Animation for Visual Appeal -->
+    <div class="background-animation">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+    </div>
+    
+    <!-- Main Card Container -->
+    <div class="card-container" id="app">
+        <!-- Content will be injected dynamically via main.js -->
+    </div>
+
+    <!-- SVG Filter for Custom Colored QR Transparency -->
+    <svg width="0" height="0" style="position: absolute; pointer-events: none;">
+        <filter id="qr-theme-filter" color-interpolation-filters="sRGB">
+            <feColorMatrix type="matrix" values="
+                0 0 0 0 0.20
+                0 0 0 0 0.83
+                0 0 0 0 0.60
+                -1 0 0 1 0
+            "/>
+        </filter>
+    </svg>
+
+    <!-- html2canvas library for downloading card -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Vanilla Tilt for 3D hover effect -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    
+    <!-- Scripts -->
+    <script src="/data.js" defer></script>
+    <script src="/main.js" defer></script>
+</body>
+</html>

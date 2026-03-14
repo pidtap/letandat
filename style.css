@@ -492,7 +492,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: opacity 2s cubic-bezier(0.77, 0, 0.175, 1), visibility 2s cubic-bezier(0.77, 0, 0.175, 1);
+    transition: opacity 0.5s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.5s cubic-bezier(0.77, 0, 0.175, 1);
     overflow: hidden;
 }
 
@@ -503,11 +503,11 @@ body {
 }
 
 .intro-overlay.marvel-zoom-out .intro-card {
-    animation: marvelOut 2s cubic-bezier(0.77, 0, 0.175, 1) forwards !important;
+    animation: marvelOut 0.5s cubic-bezier(0.77, 0, 0.175, 1) forwards !important;
 }
 
 .intro-overlay.marvel-zoom-out .intro-blob {
-    animation: marvelBlobOut 2s ease-in forwards !important;
+    animation: marvelBlobOut 0.5s ease-in forwards !important;
 }
 
 @keyframes marvelOut {

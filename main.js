@@ -14,13 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (introBtn && introOverlay) {
         introBtn.addEventListener('click', () => {
-            // Thêm class để chạy hiệu ứng chuyển cảnh maver 2s mượt mà
+            // Thêm class để chạy hiệu ứng chuyển cảnh maver 0.5s mượt mà
             introOverlay.classList.add('marvel-zoom-out');
             
-            // Chờ hiệu ứng 2s hoàn thành rồi ẩn hẳn
+            // Chờ hiệu ứng 0.5s hoàn thành rồi ẩn hẳn
             setTimeout(() => {
                 introOverlay.style.display = 'none';
-            }, 2000);
+            }, 500);
         });
     }
 
@@ -267,25 +267,74 @@ window.copyToClipboard = function(text) {
 };
 
 window.shareQRCode = async function() {
-    const qrImageSrc = document.getElementById('qrImage').src;
-    
-    try {
-        const response = await fetch(qrImageSrc);
-        const blob = await response.blob();
-        const file = new File([blob], 'thong_tin_thanh_toan.png', { type: blob.type });
+    const qrContainer = document.querySelector('.bank-qr');
+    const actionBtns = qrContainer.querySelector('.bank-action');
+    const shareBtn = qrContainer.querySelector('.share-btn');
+    const originalShareBtnHTML = shareBtn.innerHTML;
 
-        if (navigator.share) {
-            await navigator.share({
-                title: 'Thông tin thanh toán',
-                text: 'Gửi bạn thông tin thanh toán của ' + userData.name,
-                files: [file]
-            });
-        } else {
-            alert("Trình duyệt không hỗ trợ chia sẻ hình ảnh trực tiếp. Vui lòng lưu ảnh (giữ đè lên ảnh QR) để gửi.");
-        }
+    // Hiệu ứng loading nút share
+    shareBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    shareBtn.style.pointerEvents = 'none';
+
+    // Ẩn nút chức năng phần chụp để ảnh đẹp hơn
+    const originalDisplayStyle = actionBtns.style.display;
+    actionBtns.style.display = 'none';
+
+    // Đảm bảo mảng chứa có nền solid khi snapshot (vì glassmorphism có thể bị lỗi trong html2canvas)
+    const originalBackground = qrContainer.style.background;
+    qrContainer.style.background = 'rgba(30, 41, 59, 1)'; // Solid color tiệp với thẻ card
+
+    try {
+        const canvas = await html2canvas(qrContainer, {
+            scale: 3, // Phóng to x3 để ảnh render siêu nét
+            useCORS: true,
+            backgroundColor: 'transparent'
+        });
+        
+        // Khôi phục lại UI ban đầu
+        actionBtns.style.display = originalDisplayStyle || 'flex';
+        qrContainer.style.background = originalBackground || '';
+
+        canvas.toBlob(async (blob) => {
+            const fileName = 'ThongTinThanhToan_' + userData.name.replace(/\s+/g, '') + '.png';
+            const file = new File([blob], fileName, { type: 'image/png' });
+
+            // Kiểm tra trình duyệt có hỗ trợ Web Share API chia sẻ tệp không
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        title: 'Thông tin thanh toán',
+                        text: 'Gửi bạn thông tin thanh toán của ' + userData.name,
+                        files: [file]
+                    });
+                } catch (err) {
+                    console.log('Huỷ chia sẻ hoặc lỗi:', err);
+                }
+            } else {
+                // Nếu không hỗ trợ (ví dụ PC cũ), tự động lưu ảnh xuống
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast("Đã tải thông tin QR về máy!");
+            }
+            
+            // Khôi phục nút
+            shareBtn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                shareBtn.innerHTML = originalShareBtnHTML;
+                shareBtn.style.pointerEvents = 'auto';
+            }, 2000);
+
+        }, 'image/png');
+
     } catch (error) {
-        console.error('Lỗi khi chia sẻ ảnh:', error);
-        alert("Có lỗi xảy ra khi chuẩn bị ảnh chia sẻ.");
+        console.error('Lỗi khi tạo ảnh QR:', error);
+        actionBtns.style.display = originalDisplayStyle || 'flex';
+        qrContainer.style.background = originalBackground || '';
+        showToast("Có lỗi xảy ra khi tạo ảnh.");
+        shareBtn.innerHTML = originalShareBtnHTML;
+        shareBtn.style.pointerEvents = 'auto';
     }
 };
 

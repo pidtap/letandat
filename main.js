@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Intro Popup Logic
     const introOverlay = document.getElementById('introOverlay');
     const introBtn = document.getElementById('introBtn');
-    
+
     // Populate intro popup data
     const introAvatar = document.getElementById('introAvatar');
     const introName = document.getElementById('introName');
@@ -14,7 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (introBtn && introOverlay) {
         introBtn.addEventListener('click', () => {
-            introOverlay.classList.add('hidden');
+            // Thêm class để chạy hiệu ứng chuyển cảnh maver 2s mượt mà
+            introOverlay.classList.add('marvel-zoom-out');
+            
+            // Chờ hiệu ứng 2s hoàn thành rồi ẩn hẳn
+            setTimeout(() => {
+                introOverlay.style.display = 'none';
+            }, 2000);
         });
     }
 
@@ -109,7 +115,113 @@ document.addEventListener('DOMContentLoaded', () => {
             easing: "cubic-bezier(.03,.98,.52,.99)" // Cảm giác mượt
         });
     }
+
+    // --- Hiệu Ứng Hạt Sáng Nền (Particles) ---
+    initParticles();
 });
+
+// Hàm khởi tạo và chạy hiệu ứng hạt nền
+function initParticles() {
+    const canvas = document.getElementById('bg-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let particlesArray;
+
+    // Xét kích thước Canvas
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Lắng nghe sự kiện thay đổi kích thước cửa sổ
+    window.addEventListener('resize', function() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        init(); // Vẽ lại hạt cho chuẩn
+    });
+
+    // Tạo class cấu trúc Hạt
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            // Kích thước hạt ngẫu nhiên từ 1 đến 5px
+            this.size = Math.random() * 5 + 1;
+            // Vận tốc rơi tự do nhẹ nhàng
+            this.speedX = Math.random() * 1 - 0.5; // Đi ngang
+            this.speedY = Math.random() * 1.5 - 0.75; // Đi dọc
+
+            // Cho màu ngẫu nhiên giữa Trắng, Xanh dương đậm và Hồng nhẹ
+            const colors = ['rgba(255,255,255,0.8)', 'rgba(79, 70, 229, 0.6)', 'rgba(236, 72, 153, 0.4)'];
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        // Phương pháp cập nhật vị trí hạt
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+
+            // Xử lý chạm viền: Xuyên qua bờ bên kia
+            if(this.x > canvas.width) this.x = 0;
+            else if (this.x < 0) this.x = canvas.width;
+
+            if(this.y > canvas.height) this.y = 0;
+            else if (this.y < 0) this.y = canvas.height;
+        }
+
+        // Phương pháp vẽ hạt lên Canvas
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // Hàm khởi tạo lưới hạt ban đầu
+    function init() {
+        particlesArray = [];
+        // Tính toán số lượng hạt theo tỷ lệ màn hình (tránh lag điện thoại)
+        let numberOfParticles = (canvas.width * canvas.height) / 12000;
+        
+        // Giới hạn số lượng tối đa và tối thiểu
+        if (numberOfParticles > 100) numberOfParticles = 100;
+        if (numberOfParticles < 30) numberOfParticles = 40; // cho mobile hiện kha khá
+
+        for (let i = 0; i < numberOfParticles; i++) {
+            particlesArray.push(new Particle());
+        }
+    }
+
+    // Hàm vòng lặp diễn hoạt (Animation Loop)
+    function animate() {
+        // Xóa khung hình cũ (dùng fillRect với rgba để tạo vệt mờ - trail effect)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+            
+            // Tùy chọn: Kết nối các hạt gần nhau bằng đường kẻ siêu mờ
+            for (let j = i; j < particlesArray.length; j++) {
+                const dx = particlesArray[i].x - particlesArray[j].x;
+                const dy = particlesArray[i].y - particlesArray[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 100) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(255,255,255,${0.1 - distance/1000})`; // Càng xa viền càng mờ
+                    ctx.lineWidth = 0.5;
+                    ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                    ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    init();
+    animate();
+}
 
 // Hàm hiển thị thông báo Toast thả trôi
 window.showToast = function(message) {

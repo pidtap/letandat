@@ -1,5 +1,5 @@
 const userData = {
-    name: "LÊ TẤN ĐẠT", // Bạn có thể thay đổi tên ở đây
+    name: "LÊ TẤT ĐẠT", // Bạn có thể thay đổi tên ở đây
     title: "Quản Lý TGDĐ Giá Rai", // Bạn có thể thay đổi chức danh ở đây
     about: "I’m David Lee. If you want to know more about me, just make friends with me!",
     avatar: "public/avatar.jpg", // URL ảnh đại diện của bạn
